@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "migrate": "ts-node scripts/migrate.ts",
+    "prisma:generate": "prisma generate"
   },
   "dependencies": {
     "@google/generative-ai": "^0.2.1",
@@ -74,5 +76,8 @@
     "utf-8-validate": "^6.0.5",
     "vaul": "^0.9.9",
     "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2"
   }
 }

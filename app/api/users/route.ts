@@ -4,40 +4,6 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function POST(req: Request) {
-  try {
-    const supabase = createRouteHandlerClient({ cookies });
-    const { word, meaning } = await req.json();
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json(
-        { error: "Authentication required" },
-        { status: 401 }
-      );
-    }
-
-    const data = await prisma.vocabularyItem.create({
-      data: {
-        word,
-        meaning,
-        userId: user.id,
-      },
-    });
-
-    return NextResponse.json(data);
-  } catch (error) {
-    console.error("Error in vocabulary API:", error);
-    return NextResponse.json(
-      { error: "Failed to save vocabulary item" },
-      { status: 500 }
-    );
-  }
-}
-
 export async function GET(req: Request) {
   try {
     const supabase = createRouteHandlerClient({ cookies });
@@ -53,20 +19,52 @@ export async function GET(req: Request) {
       );
     }
 
-    const data = await prisma.vocabularyItem.findMany({
+    const userData = await prisma.user.findUnique({
       where: {
-        userId: user.id,
-      },
-      orderBy: {
-        createdAt: 'desc',
+        id: user.id,
       },
     });
 
-    return NextResponse.json(data);
+    return NextResponse.json(userData);
   } catch (error) {
-    console.error("Error in vocabulary API:", error);
+    console.error("Error in user API:", error);
     return NextResponse.json(
-      { error: "Failed to fetch vocabulary items" },
+      { error: "Failed to fetch user data" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PUT(req: Request) {
+  try {
+    const supabase = createRouteHandlerClient({ cookies });
+    const { name } = await req.json();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json(
+        { error: "Authentication required" },
+        { status: 401 }
+      );
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        name,
+      },
+    });
+
+    return NextResponse.json(updatedUser);
+  } catch (error) {
+    console.error("Error in user API:", error);
+    return NextResponse.json(
+      { error: "Failed to update user data" },
       { status: 500 }
     );
   }
