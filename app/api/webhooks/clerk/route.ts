@@ -1,50 +1,67 @@
-// src/app/api/webhooks/clerk
-
+import { Webhook } from 'svix';
+import { headers } from 'next/headers';
+import { WebhookEvent } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/prisma';
-import type { WebhookEvent } from '@clerk/nextjs/server';
-import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
-    try {
-        const evt = (await req.json()) as WebhookEvent;
+  const SIGNING_SECRET = process.env.SIGNING_SECRET;
 
-        const { id: clerkUserId } = evt.data;
-        if (!clerkUserId)
-            return NextResponse.json(
-                { error: 'No user ID provided' },
-                { status: 400 },
-            );
+  if (!SIGNING_SECRET) {
+    throw new Error('Error: Please add SIGNING_SECRET from Clerk Dashboard to .env or .env');
+  }
 
-        let user = null;
-        switch (evt.type) {
-            case 'user.created': {
-                user = await prisma.user.upsert({
-                    where: {
-                        clerkUserId,
-                    },
-                    update: {
-                        clerkUserId,
-                    },
-                    create: {
-                        clerkUserId,
-                    },
-                });
-                break;
-            }
-            case 'user.deleted': {
-                user = await prisma.user.delete({
-                    where: {
-                        clerkUserId,
-                    },
-                });
-                break;
-            }
-            default:
-                break;
-        }
+  // Create new Svix instance with secret
+  const wh = new Webhook(SIGNING_SECRET);
 
-        return NextResponse.json({ user });
-    } catch (error) {
-        return NextResponse.json({ error }, { status: 500 });
-    }
+  // Get headers
+  const headerPayload = await headers();
+  const svix_id = headerPayload.get('svix-id');
+  const svix_timestamp = headerPayload.get('svix-timestamp');
+  const svix_signature = headerPayload.get('svix-signature');
+
+  // If there are no headers, error out
+  if (!svix_id || !svix_timestamp || !svix_signature) {
+    return new Response('Error: Missing Svix headers', {
+      status: 400,
+    });
+  }
+
+  // Get body
+  const payload = await req.json();
+  const body = JSON.stringify(payload);
+
+  let evt: WebhookEvent;
+
+  // Verify payload with headers
+  try {
+    evt = wh.verify(body, {
+      'svix-id': svix_id,
+      'svix-timestamp': svix_timestamp,
+      'svix-signature': svix_signature,
+    }) as WebhookEvent;
+  } catch (err) {
+    console.error('Error: Could not verify webhook:', err);
+    return new Response('Error: Verification error', {
+      status: 400,
+    });
+  }
+
+  // Do something with payload
+  const { id } = evt.data;
+  const eventType = evt.type;
+
+  console.log(`Received webhook with ID ${id} and event type of ${eventType}`);
+  console.log('Webhook payload:', body);
+
+  // ユーザー作成の処理を追加
+  if (eventType === 'user.created') {
+    const userData = evt.data;
+    const user = await prisma.user.create({
+      data: {
+        clerkUserId: userData.id,
+      },
+    });
+    console.log('User created:', user);
+  }
+  return new Response('Webhook received', { status: 200 });
 }
