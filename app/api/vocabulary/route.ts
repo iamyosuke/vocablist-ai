@@ -1,8 +1,6 @@
-
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 
 export async function POST(req: Request) {
   try {
@@ -20,13 +18,19 @@ export async function POST(req: Request) {
       );
     }
 
-    const data = await prisma.vocabularyItem.create({
-      data: {
-        word,
-        meaning,
-        userId: user.id,
-      },
-    });
+    const { data, error } = await supabase
+      .from("vocabulary_items")
+      .insert([
+        {
+          user_id: user.id,
+          word,
+          meaning,
+        },
+      ])
+      .select()
+      .single();
+
+    if (error) throw error;
 
     return NextResponse.json(data);
   } catch (error) {
@@ -53,14 +57,12 @@ export async function GET(req: Request) {
       );
     }
 
-    const data = await prisma.vocabularyItem.findMany({
-      where: {
-        userId: user.id,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+    const { data, error } = await supabase
+      .from("vocabulary_items")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
 
     return NextResponse.json(data);
   } catch (error) {
