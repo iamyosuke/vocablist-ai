@@ -4,6 +4,7 @@ import { WebhookEvent } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/prisma';
 
 export async function POST(req: Request) {
+  console.log('Received webhook');
   const SIGNING_SECRET = process.env.SIGNING_SECRET;
 
   if (!SIGNING_SECRET) {
@@ -63,5 +64,6 @@ export async function POST(req: Request) {
     });
     console.log('User created:', user);
   }
+
   return new Response('Webhook received', { status: 200 });
 }
