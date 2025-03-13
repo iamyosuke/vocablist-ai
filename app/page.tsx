@@ -1,10 +1,10 @@
-import { getSupabaseUser } from '@/lib/getSupabaseUser';
 import { prisma } from '@/lib/prisma';
 import { Brain } from "lucide-react";
 import { VocabularyClientWrapper } from './components/vocabulary-client-wrapper';
 import { Vocabulary } from '@prisma/client';
 import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
+import { User, Language } from '@prisma/client';
 async function getVocabularyItems(supabaseUserId: string) {
   return await prisma.vocabulary.findMany({
     where: { userId: supabaseUserId},
@@ -27,15 +27,20 @@ export default async function Home() {
       data: {
         clerkUserId: userId,
       },
+      include: {
+        interfaceLanguage: true,
+        studyLanguage: true,
+      },
     });
   }
 
-  const vocabularyItems = await getVocabularyItems(supabaseUser.id);
-  const defaultSettings = {
-    interfaceLanguage: "en",
-    studyLanguage: "ja",
-  };
+  if (!supabaseUser.isOnboarded) {
+    redirect('/onboarding');
+  }
 
+
+
+  const vocabularyItems = await getVocabularyItems(supabaseUser.id);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 relative overflow-hidden">
@@ -53,6 +58,7 @@ export default async function Home() {
 
         <VocabularyClientWrapper 
           initialItems={vocabularyItems as Vocabulary[]}
+          user={supabaseUser as User & { interfaceLanguage: Language; studyLanguage: Language }}
         />
       </div>
     </div>

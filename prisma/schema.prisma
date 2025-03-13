@@ -18,7 +18,21 @@ model User {
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
   clerkUserId     String       @unique
+  interfaceLanguageId Int?      
+  interfaceLanguage Language? @relation("UserInterfaceLanguage", fields: [interfaceLanguageId], references: [id])
+  studyLanguageId   Int?       
+  studyLanguage   Language? @relation("UserStudyLanguage", fields: [studyLanguageId], references: [id])
+  isOnboarded       Boolean      @default(false)
   Vocabulary      Vocabulary[]
+}
+model Language {
+  id       Int       @id @default(autoincrement())
+  code     String    @unique
+  name     String
+  nameEn   String
+  order    Int
+  usersWithInterfaceLanguage User[] @relation("UserInterfaceLanguage")
+  usersWithStudyLanguage User[] @relation("UserStudyLanguage")
 }
 
 model Vocabulary {
