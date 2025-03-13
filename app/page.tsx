@@ -2,19 +2,35 @@ import { getSupabaseUser } from '@/lib/getSupabaseUser';
 import { prisma } from '@/lib/prisma';
 import { Brain } from "lucide-react";
 import { VocabularyClientWrapper } from './components/vocabulary-client-wrapper';
-import { TRANSLATIONS } from "./constants";
 import { Vocabulary } from '@prisma/client';
-
-async function getVocabularyItems() {
-  const user = await getSupabaseUser();
+import { auth } from '@clerk/nextjs/server';
+import { redirect } from 'next/navigation';
+async function getVocabularyItems(supabaseUserId: string) {
   return await prisma.vocabulary.findMany({
-    where: { userId: user.id },
+    where: { userId: supabaseUserId},
     orderBy: { createdAt: 'desc' },
   });
 }
 
 export default async function Home() {
-  const vocabularyItems = await getVocabularyItems();
+  const { userId } = await auth();
+  if (!userId) {
+    redirect('/sign-in');
+  }
+
+  let supabaseUser = await prisma.user.findUnique({
+    where: { clerkUserId: userId },
+  });
+
+  if (!supabaseUser) {
+    supabaseUser = await prisma.user.create({
+      data: {
+        clerkUserId: userId,
+      },
+    });
+  }
+
+  const vocabularyItems = await getVocabularyItems(supabaseUser.id);
   const defaultSettings = {
     interfaceLanguage: "en",
     studyLanguage: "ja",

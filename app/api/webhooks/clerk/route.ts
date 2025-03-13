@@ -54,11 +54,16 @@ export async function POST(req: Request) {
   // ユーザー作成の処理を追加
   if (eventType === 'user.created') {
     const userData = evt.data;
-    const user = await prisma.user.create({
-      data: {
-        clerkUserId: userData.id,
-      },
+    let user = await prisma.user.findUnique({
+      where: { clerkUserId: userData.id },
     });
+    if (!user) {
+      user = await prisma.user.create({
+        data: {
+          clerkUserId: userData.id,
+        },
+      });
+    }
     console.log('User created:', user);
   }
 
