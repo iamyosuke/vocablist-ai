@@ -20,7 +20,6 @@ export default async function Home() {
     studyLanguage: "ja",
   };
 
-  const t = TRANSLATIONS[defaultSettings.interfaceLanguage as keyof typeof TRANSLATIONS] || TRANSLATIONS.en;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 relative overflow-hidden">
@@ -38,7 +37,6 @@ export default async function Home() {
 
         <VocabularyClientWrapper 
           initialItems={vocabularyItems as Vocabulary[]}
-          t={t}
         />
       </div>
     </div>

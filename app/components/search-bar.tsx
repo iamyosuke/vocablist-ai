@@ -3,13 +3,11 @@
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useVocabularyStore } from "@/app/store/vocabulary";
+import { useTranslations } from 'next-intl';
 
-interface SearchBarProps {
-  placeholder: string;
-}
-
-export function SearchBar({ placeholder }: SearchBarProps) {
+export function SearchBar() {
   const { searchTerm, setSearchTerm } = useVocabularyStore();
+  const t = useTranslations('search-bar');
 
   return (
     <div className="relative max-w-2xl mx-auto">
@@ -18,7 +16,7 @@ export function SearchBar({ placeholder }: SearchBarProps) {
         <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
         <Input
           className="pl-12 pr-4 py-6 w-full bg-white/80 backdrop-blur-sm border-0 ring-2 ring-gray-200/50 focus:ring-2 focus:ring-indigo-500/50 rounded-lg shadow-lg"
-          placeholder={placeholder}
+          placeholder={t('search')}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />

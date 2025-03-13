@@ -1,0 +1,39 @@
+{
+  "vocabulary": {
+    "title": "Vocablist AI",
+    "search": "Search words...",
+    "addWord": "Add Word",
+    "enterWord": "Enter a word",
+    "generateMeaning": "Generate Meaning",
+    "save": "Save",
+    "cancel": "Cancel",
+    "added": "Added",
+    "noWords": "No words added yet",
+    "noMatches": "No matching words found"
+  },
+  "common": {
+    "add": "Add",
+    "cancel": "Cancel",
+    "save": "Save"
+  },
+  "search-bar": {
+    "search": "Search words..."
+  },
+  "add-word-dialog": {
+    "addWord": "Add Word",
+    "enterWord": "Enter a word",
+    "generateMeaning": "Generate Meaning",
+    "cancel": "Cancel",
+    "save": "Save"
+  },
+  "vocabulary-list": {
+    "added": "Added",
+    "noWords": "No words added yet",
+    "noMatches": "No matching words found"
+  },
+  "word-detail": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "added": "Added"
+  }
+}

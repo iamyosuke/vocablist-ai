@@ -1,0 +1,14 @@
+{
+  "vocabulary": {
+    "title": "Vocablist AI",
+    "search": "単語を検索...",
+    "addWord": "単語を追加",
+    "enterWord": "単語を入力",
+    "generateMeaning": "意味を生成",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "added": "追加日",
+    "noWords": "単語がまだありません",
+    "noMatches": "一致する単語が見つかりません"
+  }
+}

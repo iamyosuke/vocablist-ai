@@ -6,19 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useTranslations } from "next-intl";
+import { useVocabularyStore } from "@/app/store/vocabulary";
 
-interface AddWordDialogProps {
-  t: any;
-  onSave: (word: string, meaning: string) => void;
-}
-
-export function AddWordDialog({ t, onSave }: AddWordDialogProps) {
+export function AddWordDialog() {
+  const { addItem } = useVocabularyStore();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [word, setWord] = useState("");
   const [generatedMeaning, setGeneratedMeaning] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-
+  const t = useTranslations('add-word-dialog');
   const handleGenerateMeaning = async () => {
     if (!word.trim()) return;
     
@@ -47,13 +45,32 @@ export function AddWordDialog({ t, onSave }: AddWordDialogProps) {
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!word.trim() || !generatedMeaning.trim()) return;
-    onSave(word.trim(), generatedMeaning);
-    setWord("");
-    setGeneratedMeaning("");
-    setIsEditing(false);
-    setIsDialogOpen(false);
+
+    try {
+      const response = await fetch("/api/vocabulary", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          word: word.trim(),
+          meaning: generatedMeaning,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to save vocabulary item");
+
+      const data = await response.json();
+      addItem(data);
+      setWord("");
+      setGeneratedMeaning("");
+      setIsEditing(false);
+      setIsDialogOpen(false);
+    } catch (error) {
+      console.error("Error saving vocabulary item:", error);
+    }
   };
 
   const handleCancel = () => {
@@ -67,18 +84,18 @@ export function AddWordDialog({ t, onSave }: AddWordDialogProps) {
         <DialogTrigger asChild>
           <Button size="lg" className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-full px-8 py-6 shadow-lg hover:shadow-xl transition-all duration-300">
             <Plus className="w-5 h-5 mr-2" />
-            {t.addWord}
+            {t('addWord')}
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[500px] bg-white/95 backdrop-blur-sm border-0 shadow-2xl">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              {t.addWord}
+              {t('addWord')}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 mt-4">
             <Input
-              placeholder={t.enterWord}
+              placeholder={t('enterWord')}
               value={word}
               onChange={(e) => setWord(e.target.value)}
               className="border-0 ring-2 ring-gray-200/50 focus:ring-2 focus:ring-indigo-500/50"
@@ -94,7 +111,7 @@ export function AddWordDialog({ t, onSave }: AddWordDialogProps) {
                 ) : (
                   <Brain className="h-4 w-4 mr-2" />
                 )}
-                {t.generateMeaning}
+                {t('generateMeaning')}
               </Button>
             ) : (
               <div className="space-y-4">
@@ -111,14 +128,14 @@ export function AddWordDialog({ t, onSave }: AddWordDialogProps) {
                     className="flex-1"
                   >
                     <X className="h-4 w-4 mr-2" />
-                    {t.cancel}
+                    {t('cancel')}
                   </Button>
                   <Button
                     onClick={handleSave}
                     className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
                   >
                     <Check className="h-4 w-4 mr-2" />
-                    {t.save}
+                    {t('save')}
                   </Button>
                 </div>
               </div>

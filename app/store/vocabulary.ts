@@ -4,8 +4,12 @@ import { Vocabulary } from '@prisma/client';
 interface VocabularyStore {
   items: Vocabulary[];
   filteredItems: Vocabulary[];
+  selectedWord: Vocabulary | null;
+  isDetailOpen: boolean;
   setItems: (items: Vocabulary[]) => void;
   setFilteredItems: (items: Vocabulary[]) => void;
+  setSelectedWord: (word: Vocabulary | null) => void;
+  setIsDetailOpen: (isOpen: boolean) => void;
   addItem: (item: Vocabulary) => void;
   updateItem: (item: Vocabulary) => void;
   searchTerm: string;
@@ -15,9 +19,13 @@ interface VocabularyStore {
 export const useVocabularyStore = create<VocabularyStore>((set) => ({
   items: [],
   filteredItems: [],
+  selectedWord: null,
+  isDetailOpen: false,
   searchTerm: '',
   setItems: (items) => set({ items, filteredItems: items }),
   setFilteredItems: (filteredItems) => set({ filteredItems }),
+  setSelectedWord: (selectedWord) => set({ selectedWord }),
+  setIsDetailOpen: (isDetailOpen) => set({ isDetailOpen }),
   addItem: (item) => set((state) => ({ 
     items: [item, ...state.items],
     filteredItems: [item, ...state.items] 
