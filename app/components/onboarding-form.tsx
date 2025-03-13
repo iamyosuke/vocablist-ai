@@ -77,7 +77,7 @@ export function OnboardingForm({ languages }: OnboardingFormProps) {
           required
         >
           <option value="">言語を選択してください</option>
-          {languages.map((language) => (
+          {languages.filter(language => language.isInterface).map((language) => (
             <option key={language.id} value={language.id}>
               {language.name} ({language.nameEn})
             </option>

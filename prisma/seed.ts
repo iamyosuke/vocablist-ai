@@ -6,8 +6,8 @@ const prisma = new PrismaClient()
 async function main() {
   // 言語データをシード
   const languages = [
-    { code: 'en', name: 'English', nameEn: 'English', order: 1 },
-    { code: 'ja', name: '日本語', nameEn: 'Japanese', order: 2 },
+    { code: 'en', name: 'English', nameEn: 'English', order: 1, isInterface: true },
+    { code: 'ja', name: '日本語', nameEn: 'Japanese', order: 2, isInterface: true },
     { code: 'es', name: 'Español', nameEn: 'Spanish', order: 3 },
     { code: 'fr', name: 'Français', nameEn: 'French', order: 4 },
     { code: 'de', name: 'Deutsch', nameEn: 'German', order: 5 },

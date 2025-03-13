@@ -30,6 +30,7 @@ model Language {
   code     String    @unique
   name     String
   nameEn   String
+  isInterface Boolean @default(false)
   order    Int
   usersWithInterfaceLanguage User[] @relation("UserInterfaceLanguage")
   usersWithStudyLanguage User[] @relation("UserStudyLanguage")
