@@ -4,7 +4,6 @@ import { Brain } from "lucide-react";
 import { VocabularyClientWrapper } from './components/vocabulary-client-wrapper';
 import { TRANSLATIONS } from "./constants";
 import { Vocabulary } from '@prisma/client';
-import React from 'react';
 
 async function getVocabularyItems() {
   const user = await getSupabaseUser();
@@ -14,12 +13,13 @@ async function getVocabularyItems() {
   });
 }
 
-const HomePage = async () => {
+export default async function Home() {
   const vocabularyItems = await getVocabularyItems();
   const defaultSettings = {
     interfaceLanguage: "en",
     studyLanguage: "ja",
   };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 relative overflow-hidden">
@@ -41,6 +41,4 @@ const HomePage = async () => {
       </div>
     </div>
   );
-};
-
-export default HomePage;
+}
