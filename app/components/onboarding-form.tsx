@@ -2,13 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Language } from '@prisma/client';
+import { Language, User } from '@prisma/client';
 
-interface OnboardingFormProps {
-  languages: Language[];
-}
 
-export function OnboardingForm({ languages }: OnboardingFormProps) {
+export function OnboardingForm({ languages, user }: { languages: Language[], user: User }) {
   const router = useRouter();
   
   // デフォルト値を設定
