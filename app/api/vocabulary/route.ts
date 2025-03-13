@@ -1,33 +1,21 @@
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
+import { getSupabaseUser } from '@/lib/getSupabaseUser';
+import { prisma } from '@/lib/prisma';
 
 export async function POST(req: Request) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
     const { word, meaning } = await req.json();
+    const supabaseUser = await getSupabaseUser();
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
-
-    const { data, error } = await supabase
-      .from('vocabulary_items')
-      .insert([
-        {
-          user_id: user.id,
-          word,
-          meaning,
-        },
-      ])
-      .select()
-      .single();
-
-    if (error) throw error;
+    const data = await prisma.vocabulary.create({
+      data: {
+        userId: supabaseUser.id,
+        word,
+        meaning,
+      },
+    });
 
     return NextResponse.json(data);
   } catch (error) {
@@ -38,19 +26,12 @@ export async function POST(req: Request) {
 
 export async function GET(req: Request) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabaseUser = await getSupabaseUser();
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
-
-    const { data, error } = await supabase.from('vocabulary_items').select('*').order('created_at', { ascending: false });
-
-    if (error) throw error;
+    const data = await prisma.vocabulary.findMany({
+      where: { userId: supabaseUser.id },
+      orderBy: { createdAt: 'desc' },
+    });
 
     return NextResponse.json(data);
   } catch (error) {
