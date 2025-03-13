@@ -5,8 +5,8 @@ import { SearchBar } from './search-bar';
 import { VocabularyList } from './vocabulary-list';
 import { AddWordDialog } from './add-word-dialog';
 import { useVocabularyStore } from '@/app/store/vocabulary';
-import type { Vocabulary } from '@prisma/client';
 import { WordDetail } from './word-detail';
+import { Vocabulary } from '@prisma/client';
 interface VocabularyClientWrapperProps {
   initialItems: Vocabulary[];
 }
