@@ -1,16 +1,14 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
+
+  
   provider = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  schemas = ["vocablist-ai"]
 }
 
 model User {
@@ -24,7 +22,9 @@ model User {
   studyLanguage   Language? @relation("UserStudyLanguage", fields: [studyLanguageId], references: [id])
   isOnboarded       Boolean      @default(false)
   Vocabulary      Vocabulary[]
+  @@schema("vocablist-ai")
 }
+
 model Language {
   id       Int       @id @default(autoincrement())
   code     String    @unique
@@ -34,6 +34,7 @@ model Language {
   order    Int
   usersWithInterfaceLanguage User[] @relation("UserInterfaceLanguage")
   usersWithStudyLanguage User[] @relation("UserStudyLanguage")
+  @@schema("vocablist-ai")
 }
 
 model Vocabulary {
@@ -44,4 +45,5 @@ model Vocabulary {
   user      User   @relation(fields: [userId], references: [id])
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
+  @@schema("vocablist-ai")
 }
